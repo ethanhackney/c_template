@@ -1,0 +1,103 @@
+array<NAME,TYPE>
+----------------
+array
+
+sorted_array<NAME,TYPE,CMP_FN>
+------------------------------
+sorted array
+
+rbuf<NAME,TYPE>
+---------------
+ring buffer
+
+sorted_rbuf<NAME,TYPE,CMP_FN>
+-----------------------------
+sorted ring buffer
+
+bitset<NAME,TYPE,BITS_IN_TYPE>
+------------------------------
+bit set
+
+slist<NAME,TYPE>
+----------------
+singly linked list
+
+dlist<NAME,TYPE>
+----------------
+doubly linked list
+
+sorted_slist<NAME,TYPE,CMP_FN>
+------------------------------
+sorted singly linked list
+
+sorted_dlist<NAME,TYPE,CMP_FN>
+------------------------------
+sorted doubly linked list
+
+rb_map<NAME,KEY_T,VALUE_T,KEY_CMP>
+----------------------------------
+red black tree map
+
+rb_set<NAME,TYPE,KEY_CMP>
+-------------------------
+red black tree set
+
+avl_map<NAME,KEY_T,VALUE_T,KEY_CMP>
+-----------------------------------
+avl tree map
+
+avl_set<NAME,TYPE,KEY_CMP>
+--------------------------
+avl tree set
+
+btree_map<NAME,KEY_T,VALUE_T,KEY_CMP>
+-----------------------------------
+btree map
+
+btree_set<NAME,TYPE,KEY_CMP>
+--------------------------
+btree set
+
+slist_hash_map<NAME,KEY_T,VALUE_T,KEY_CMP,HASH_FN>
+--------------------------------------------------
+singly linked hash map
+
+dlist_hash_map<NAME,KEY_T,VALUE_T,KEY_CMP,HASH_FN>
+--------------------------------------------------
+doubly linked hash map
+
+slist_hash_set<NAME,KEY_T,VALUE_T,KEY_CMP,HASH_FN>
+--------------------------------------------------
+singly linked hash set
+
+dlist_hash_set<NAME,KEY_T,VALUE_T,KEY_CMP,HASH_FN>
+--------------------------------------------------
+doubly linked hash set
+
+linear_hash_map<NAME,KEY_T,VALUE_T,KEY_CMP,HASH_FN>
+--------------------------------------------------
+linear probing hash map
+
+linear_hash_set<NAME,KEY_T,VALUE_T,KEY_CMP,HASH_FN>
+--------------------------------------------------
+linear probing hash set
+
+quad_hash_map<NAME,KEY_T,VALUE_T,KEY_CMP,HASH_FN>
+--------------------------------------------------
+quadratic probing hash map
+
+quad_hash_set<NAME,KEY_T,VALUE_T,KEY_CMP,HASH_FN>
+--------------------------------------------------
+quadratic probing hash set
+
+double_hash_map<NAME,KEY_T,VALUE_T,KEY_CMP,HASH_FN>
+--------------------------------------------------
+double hash probing hash map
+
+double_hash_set<NAME,KEY_T,VALUE_T,KEY_CMP,HASH_FN>
+--------------------------------------------------
+double hash probing hash set
+
+binary_heap<NAME,TYPE,CMP_FN>
+-----------------------------
+binary heap

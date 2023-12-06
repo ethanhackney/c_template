@@ -1,5 +1,8 @@
 #include "NAME.h"
 
+#define NODE_OF(p) \
+        ((struct NAME_node *)((char *)(p) - offsetof(struct NAME_node, n_pair)))
+
 struct NAME *
 NAME_new(void)
 {
@@ -187,21 +190,224 @@ rb_right_rotate(struct NAME *rp, struct NAME_node *np)
         np->n_parent = left;
 }
 
-static void rb_for_each(struct NAME *rp,
-                        struct NAME_node *np,
-                        void (*fn)(struct NAME_pair *));
+static void rb_for_each_preorder(struct NAME *rp,
+                                 struct NAME_node *np,
+                                 void (*fn)(struct NAME_pair *));
 
-void NAME_for_each(struct NAME *rp, void (*fn)(struct NAME_pair *))
+static void rb_for_each_inorder(struct NAME *rp,
+                                struct NAME_node *np,
+                                void (*fn)(struct NAME_pair *));
+
+static void rb_for_each_postorder(struct NAME *rp,
+                                  struct NAME_node *np,
+                                  void (*fn)(struct NAME_pair *));
+
+void NAME_for_each(struct NAME *rp, int type, void (*fn)(struct NAME_pair *))
 {
-        rb_for_each(rp, rp->r_root, fn);
+        if (type == NAME_FOR_PREORDER)
+                rb_for_each_preorder(rp, rp->r_root, fn);
+        if (type == NAME_FOR_INORDER)
+                rb_for_each_inorder(rp, rp->r_root, fn);
+        if (type == NAME_FOR_POSTORDER)
+                rb_for_each_postorder(rp, rp->r_root, fn);
 }
 
 static void
-rb_for_each(struct NAME *rp, struct NAME_node *np, void (*fn)(struct NAME_pair *))
+rb_for_each_preorder(struct NAME *rp,
+                     struct NAME_node *np,
+                     void (*fn)(struct NAME_pair *))
 {
         if (np == &rp->r_nil)
                 return;
-        rb_for_each(rp, np->n_left, fn);
         fn(&np->n_pair);
-        rb_for_each(rp, np->n_right, fn);
+        rb_for_each_preorder(rp, np->n_left, fn);
+        rb_for_each_preorder(rp, np->n_right, fn);
+}
+
+static void
+rb_for_each_inorder(struct NAME *rp,
+                    struct NAME_node *np,
+                    void (*fn)(struct NAME_pair *))
+{
+        if (np == &rp->r_nil)
+                return;
+        rb_for_each_inorder(rp, np->n_left, fn);
+        fn(&np->n_pair);
+        rb_for_each_inorder(rp, np->n_right, fn);
+}
+
+static void
+rb_for_each_postorder(struct NAME *rp,
+                      struct NAME_node *np,
+                      void (*fn)(struct NAME_pair *))
+{
+        if (np == &rp->r_nil)
+                return;
+        rb_for_each_postorder(rp, np->n_left, fn);
+        rb_for_each_postorder(rp, np->n_right, fn);
+        fn(&np->n_pair);
+}
+
+struct NAME_pair *
+NAME_lca(struct NAME *rp, struct NAME_pair *ap, struct NAME_pair *bp)
+{
+        struct NAME_node *curr = rp->r_root;
+        struct NAME_node *anode = NODE_OF(ap);
+        struct NAME_node *bnode = NODE_OF(bp);
+        KEY_T max;
+        KEY_T min;
+        int diff;
+
+        diff = KEY_CMP(anode->n_pair.p_key, bnode->n_pair.p_key);
+        if (diff < 0) {
+                min = anode->n_pair.p_key;
+                max = bnode->n_pair.p_key;
+        } else {
+                min = bnode->n_pair.p_key;
+                max = anode->n_pair.p_key;
+        }
+
+        while (curr != &rp->r_nil) {
+                if (KEY_CMP(curr->n_pair.p_key, max) > 0)
+                        curr = curr->n_left;
+                else if (KEY_CMP(curr->n_pair.p_key, min) < 0)
+                        curr = curr->n_right;
+                else
+                        return &curr->n_pair;
+        }
+
+        return NULL;
+}
+
+static void rb_dump(struct NAME *rp,
+                    struct NAME_node *np,
+                    int space,
+                    const char *fmt);
+
+void
+NAME_dump_tree(struct NAME *rp, const char *fmt)
+{
+        rb_dump(rp, rp->r_root, 0, fmt);
+}
+
+static void
+rb_dump(struct NAME *rp, struct NAME_node *np, int space, const char *fmt)
+{
+        int i;
+
+        if (np == &rp->r_nil)
+                return;
+
+        rb_dump(rp, np->n_left, space + 2, fmt);
+
+        for (i = 0; i < space; i++)
+                putchar(' ');
+
+        printf(fmt, np->n_pair.p_key);
+
+        rb_dump(rp, np->n_right, space + 2, fmt);
+}
+
+static struct NAME_node *rb_kth_smallest(struct NAME *rp,
+                                         struct NAME_node *np,
+                                         size_t *count,
+                                         size_t k);
+
+struct NAME_pair *
+NAME_kth_smallest(struct NAME *rp, size_t k)
+{
+        struct NAME_node *kth;
+        size_t count = 0;
+
+        kth = rb_kth_smallest(rp, rp->r_root, &count, k);
+        if (kth != NULL)
+                return &kth->n_pair;
+        else
+                return NULL;
+}
+
+static struct NAME_node *
+rb_kth_smallest(struct NAME *rp, struct NAME_node *np, size_t *count, size_t k)
+{
+        struct NAME_node *left;
+
+        if (np == &rp->r_nil)
+                return NULL;
+
+        left = rb_kth_smallest(rp, np->n_left, count, k);
+
+        if (left != NULL)
+                return left;
+
+        if (++(*count) == k)
+                return np;
+
+        return rb_kth_smallest(rp, np->n_right, count, k);
+}
+
+static struct NAME_node *rb_kth_largest(struct NAME *rp,
+                                        struct NAME_node *np,
+                                        size_t *count,
+                                        size_t k);
+
+struct NAME_pair *
+NAME_kth_largest(struct NAME *rp, size_t k)
+{
+        struct NAME_node *p;
+        size_t count = 0;
+
+        p = rb_kth_largest(rp, rp->r_root, &count, k);
+        if (p != NULL)
+                return &p->n_pair;
+        else
+                return NULL;
+}
+
+static struct NAME_node *
+rb_kth_largest(struct NAME *rp, struct NAME_node *np, size_t *count, size_t k)
+{
+        struct NAME_node *left;
+
+        if (np == &rp->r_nil)
+                return NULL;
+
+        left = rb_kth_largest(rp, np->n_right, count, k);
+
+        if (left != NULL)
+                return left;
+
+        if (++(*count) == k)
+                return np;
+
+        return rb_kth_largest(rp, np->n_left, count, k);
+}
+
+static size_t rb_nr_in_range(struct NAME *rp,
+                             struct NAME_node *np,
+                             KEY_T low,
+                             KEY_T high);
+
+size_t
+NAME_nr_in_range(struct NAME *rp, KEY_T low, KEY_T high)
+{
+        return rb_nr_in_range(rp, rp->r_root, low, high);
+}
+
+static size_t rb_nr_in_range(struct NAME *rp,
+                             struct NAME_node *np,
+                             KEY_T low,
+                             KEY_T high)
+{
+        size_t count = 0;
+
+        if (np == &rp->r_nil)
+                return 0;
+
+        if (KEY_CMP(np->n_pair.p_key, low) >= 0 &&
+            KEY_CMP(np->n_pair.p_key, high) <= 0)
+                count++;
+
+        count += rb_nr_in_range(rp, np->n_left, low, high);
+
+        return count + rb_nr_in_range(rp, np->n_right, low, high);
 }

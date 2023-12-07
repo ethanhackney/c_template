@@ -2,7 +2,9 @@
 
 template="$1"
 
-if [ "$template" = 'array' ] || [ "$template" = 'rbuf' ]; then
+if [ "$template" = 'array' ] || \
+   [ "$template" = 'rbuf' ] || \
+   [ "$template" = 'dlist' ]; then
         name="$2"
         datatype="$3"
 

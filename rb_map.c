@@ -534,3 +534,39 @@ NAME_ceil(struct NAME *rp, KEY_T key)
                 return &ceil->n_pair;
         return NULL;
 }
+
+static struct NAME_node *rb_min_at(struct NAME *rp, struct NAME_node *np);
+
+struct NAME_pair *
+NAME_inorder_succ(struct NAME *rp, struct NAME_pair *p)
+{
+        struct NAME_node *succ = NULL;
+        struct NAME_node *cur = rp->r_root;
+        int diff;
+
+        while (cur != &rp->r_nil) {
+                diff = KEY_CMP(p->p_key, cur->n_pair.p_key);
+                if (diff == 0) {
+                        if (cur->n_right != &rp->r_nil)
+                                succ = rb_min_at(rp, cur->n_right);
+                        break;
+                } else if (diff < 0) {
+                        succ = cur;
+                        cur = cur->n_left;
+                } else {
+                        cur = cur->n_right;
+                }
+        }
+
+        if (succ)
+                return &succ->n_pair;
+        return NULL;
+}
+
+static struct NAME_node *
+rb_min_at(struct NAME *rp, struct NAME_node *np)
+{
+        while (np->n_left != &rp->r_nil)
+                np = np->n_left;
+        return np;
+}

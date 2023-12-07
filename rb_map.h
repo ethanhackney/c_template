@@ -70,4 +70,6 @@ extern struct NAME_pair *NAME_floor(struct NAME *rp, KEY_T key);
 
 extern struct NAME_pair *NAME_ceil(struct NAME *rp, KEY_T key);
 
+extern struct NAME_pair *NAME_inorder_succ(struct NAME *rp, struct NAME_pair *p);
+
 #endif

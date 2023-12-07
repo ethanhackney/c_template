@@ -411,3 +411,126 @@ static size_t rb_nr_in_range(struct NAME *rp,
 
         return count + rb_nr_in_range(rp, np->n_right, low, high);
 }
+
+struct NAME_pair *
+NAME_min(struct NAME *rp)
+{
+        struct NAME_node *p = rp->r_root;
+
+        if (p == &rp->r_nil)
+                return NULL;
+
+        while (p->n_left != &rp->r_nil)
+                p = p->n_left;
+
+        return &p->n_pair;
+}
+
+struct NAME_pair *
+NAME_max(struct NAME *rp)
+{
+        struct NAME_node *p = rp->r_root;
+
+        if (p == &rp->r_nil)
+                return NULL;
+
+        while (p->n_right != &rp->r_nil)
+                p = p->n_right;
+
+        return &p->n_pair;
+}
+
+static struct NAME_node *rb_max_at(struct NAME *rp, struct NAME_node *np);
+
+struct NAME_pair *
+NAME_inorder_pred(struct NAME *rp, struct NAME_pair *p)
+{
+        struct NAME_node *pre;
+        struct NAME_node *cur;
+        int diff;
+
+        if (rp->r_root == &rp->r_nil)
+                return NULL;
+
+        pre = NULL;
+        cur = rp->r_root;
+        while (cur != &rp->r_nil) {
+                diff = KEY_CMP(p->p_key, cur->n_pair.p_key);
+                if (diff < 0) {
+                        cur = cur->n_left;
+                } else if (diff > 0) {
+                        pre = cur;
+                        cur = cur->n_right;
+                } else {
+                        if (cur->n_left != &rp->r_nil)
+                                pre = rb_max_at(rp, cur->n_left);
+                        break;
+                }
+        }
+
+        if (pre)
+                return &pre->n_pair;
+        return NULL;
+}
+
+static struct NAME_node *
+rb_max_at(struct NAME *rp, struct NAME_node *np)
+{
+        while (np->n_right != &rp->r_nil)
+                np = np->n_right;
+        return np;
+}
+
+struct NAME_pair *
+NAME_floor(struct NAME *rp, KEY_T key)
+{
+        struct NAME_node *floor;
+        struct NAME_node *cur;
+        int diff;
+
+        floor = NULL;
+        cur = rp->r_root;
+        while (cur != &rp->r_nil) {
+                diff = KEY_CMP(key, cur->n_pair.p_key);
+                if (diff == 0) {
+                        return &cur->n_pair;
+                } else if (diff < 0) {
+                        cur = cur->n_left;
+                } else {
+                        floor = cur;
+                        cur = cur->n_right;
+                        
+                }
+        }
+
+        if (floor)
+                return &floor->n_pair;
+        return NULL;
+}
+
+struct NAME_pair *
+NAME_ceil(struct NAME *rp, KEY_T key)
+{
+        struct NAME_node *ceil;
+        struct NAME_node *cur;
+        int diff;
+
+        ceil = NULL;
+        cur = rp->r_root;
+        while (cur != &rp->r_nil) {
+                diff = KEY_CMP(key, cur->n_pair.p_key);
+                if (diff == 0) {
+                        return &cur->n_pair;
+                } else if (diff < 0) {
+                        ceil = cur;
+                        cur = cur->n_left;
+                } else {
+                        cur = cur->n_right;
+                        
+                }
+        }
+
+        if (ceil)
+                return &ceil->n_pair;
+        return NULL;
+}

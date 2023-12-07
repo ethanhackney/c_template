@@ -60,4 +60,14 @@ extern struct NAME_pair *NAME_kth_largest(struct NAME *rp, size_t k);
 
 extern size_t NAME_nr_in_range(struct NAME *rp, KEY_T low, KEY_T high);
 
+extern struct NAME_pair *NAME_min(struct NAME *rp);
+
+extern struct NAME_pair *NAME_max(struct NAME *rp);
+
+extern struct NAME_pair *NAME_inorder_pred(struct NAME *rp, struct NAME_pair *p);
+
+extern struct NAME_pair *NAME_floor(struct NAME *rp, KEY_T key);
+
+extern struct NAME_pair *NAME_ceil(struct NAME *rp, KEY_T key);
+
 #endif

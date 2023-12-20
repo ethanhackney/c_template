@@ -13,6 +13,18 @@ if [ "$template" = 'array' ] || \
 
         sed -e "s/NAME/$name/g" \
             -e "s/TYPE/$datatype/g" <$template.c >"$name.c"
+elif [ "$template" = 'bitset' ]; then
+        name="$2"
+        datatype="$3"
+        bits_per_idx="$4"
+
+        sed -e "s/NAME/$name/g" \
+            -e "s/TYPE/$datatype/g" \
+            -e "s/BITS/$bits_per_idx/g" <$template.h >"$name.h"
+
+        sed -e "s/NAME/$name/g" \
+            -e "s/TYPE/$datatype/g" \
+            -e "s/BITS/$bits_per_idx/g" <$template.c >"$name.c"
 elif [ "$template" = 'slist_hash_map' ]; then
         name="$2"
         keytype="$3"

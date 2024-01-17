@@ -58,6 +58,18 @@ elif [ "$template" = 'rb_map' ]; then
             -e "s/KEY_T/$keytype/g" \
             -e "s/VALUE_T/$valuetype/g" \
             -e "s/KEY_CMP/$keycmp/g" <$template.c >"$name.c"
+elif [ "$template" = 'sorted_slist' ]; then
+        name="$2"
+        datatype="$3"
+        cmpfn="$4"
+
+        sed -e "s/NAME/$name/g" \
+            -e "s/CMP_FN/$cmpfn/g" \
+            -e "s/TYPE/$datatype/g" <$template.h >"$name.h"
+
+        sed -e "s/NAME/$name/g" \
+            -e "s/CMP_FN/$cmpfn/g" \
+            -e "s/TYPE/$datatype/g" <$template.c >"$name.c"
 elif [ -n "$template" ]; then
         echo invalid template: $template
 else

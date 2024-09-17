@@ -58,7 +58,7 @@ elif [ "$template" = 'rb_map' ]; then
             -e "s/KEY_T/$keytype/g" \
             -e "s/VALUE_T/$valuetype/g" \
             -e "s/KEY_CMP/$keycmp/g" <$template.c >"$name.c"
-elif [ "$template" = 'sorted_slist' ]; then
+elif [ "$template" = 'sorted_slist' ] || [ "$template" = 'pq' ]; then
         name="$2"
         datatype="$3"
         cmpfn="$4"
